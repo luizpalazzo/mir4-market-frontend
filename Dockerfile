@@ -1,4 +1,4 @@
-# Stage 1: Build
+# Dockerfile otimizado para Railway
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -17,21 +17,18 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production
-FROM nginx:alpine
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Instalar serve globalmente
+RUN npm install -g serve
 
 # Copiar arquivos buildados
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copiar configuração do nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Copiar script de inicialização
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+COPY --from=builder /app/dist ./dist
 
 # Expor porta (Railway usa variável PORT)
-EXPOSE 80
+EXPOSE 3000
 
-# Iniciar nginx com script
-CMD ["/start.sh"]
-
+# Servir aplicação (serve aceita PORT automaticamente)
+CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000}"]
