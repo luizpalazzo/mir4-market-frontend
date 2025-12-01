@@ -21,14 +21,14 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Instalar serve globalmente
-RUN npm install -g serve
-
 # Copiar arquivos buildados
 COPY --from=builder /app/dist ./dist
+
+# Copiar servidor Node.js
+COPY server.js ./
 
 # Expor porta (Railway usa variável PORT)
 EXPOSE 3000
 
-# Servir aplicação (serve aceita PORT automaticamente)
-CMD ["sh", "-c", "serve -s dist -l ${PORT:-3000}"]
+# Servir aplicação usando servidor Node.js customizado
+CMD ["node", "server.js"]
