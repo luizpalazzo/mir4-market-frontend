@@ -1,15 +1,10 @@
-// Servidor simples para servir arquivos estáticos
-import { createServer } from 'http';
-import { readFileSync, statSync } from 'fs';
-import { join, extname } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+// Servidor simples para servir arquivos estáticos (CommonJS)
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = process.env.PORT || 3000;
-const DIST_DIR = join(__dirname, 'dist');
+const DIST_DIR = path.join(__dirname, 'dist');
 
 const MIME_TYPES = {
   '.html': 'text/html',
@@ -27,23 +22,23 @@ const MIME_TYPES = {
   '.eot': 'application/vnd.ms-fontobject',
 };
 
-const server = createServer((req, res) => {
-  let filePath = join(DIST_DIR, req.url === '/' ? 'index.html' : req.url);
+const server = http.createServer((req, res) => {
+  let filePath = path.join(DIST_DIR, req.url === '/' ? 'index.html' : req.url);
 
   // SPA routing - redirecionar todas as rotas para index.html
   try {
-    const stats = statSync(filePath);
+    const stats = fs.statSync(filePath);
     if (stats.isDirectory()) {
-      filePath = join(filePath, 'index.html');
+      filePath = path.join(filePath, 'index.html');
     }
   } catch (err) {
     // Se o arquivo não existir, servir index.html (SPA routing)
-    filePath = join(DIST_DIR, 'index.html');
+    filePath = path.join(DIST_DIR, 'index.html');
   }
 
   try {
-    const content = readFileSync(filePath);
-    const ext = extname(filePath);
+    const content = fs.readFileSync(filePath);
+    const ext = path.extname(filePath);
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     res.writeHead(200, { 'Content-Type': contentType });
@@ -57,4 +52,3 @@ const server = createServer((req, res) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
 });
-
