@@ -23,16 +23,34 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  let filePath = path.join(DIST_DIR, req.url === '/' ? 'index.html' : req.url);
+  // Normalizar a URL removendo query strings e fragmentos
+  const urlPath = req.url.split('?')[0].split('#')[0];
+  let filePath = path.join(DIST_DIR, urlPath === '/' ? 'index.html' : urlPath);
 
-  // SPA routing - redirecionar todas as rotas para index.html
+  // Verificar se o arquivo existe
+  let fileExists = false;
   try {
     const stats = fs.statSync(filePath);
-    if (stats.isDirectory()) {
+    if (stats.isFile()) {
+      fileExists = true;
+    } else if (stats.isDirectory()) {
       filePath = path.join(filePath, 'index.html');
+      fileExists = fs.existsSync(filePath);
     }
   } catch (err) {
-    // Se o arquivo não existir, servir index.html (SPA routing)
+    fileExists = false;
+  }
+
+  // Se o arquivo não existe e não é uma rota de API, tentar index.html (SPA routing)
+  if (!fileExists) {
+    const ext = path.extname(urlPath);
+    // Se tem extensão (arquivo estático), retornar 404
+    if (ext && ext !== '.html') {
+      res.writeHead(404, { 'Content-Type': 'text/html' });
+      res.end('<h1>404 - Not Found</h1>');
+      return;
+    }
+    // Caso contrário, servir index.html (SPA routing)
     filePath = path.join(DIST_DIR, 'index.html');
   }
 
