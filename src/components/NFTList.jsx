@@ -14,7 +14,23 @@ const NFTList = () => {
   const [statFilters, setStatFilters] = useState([]);
   const [showStatFilterModal, setShowStatFilterModal] = useState(false);
   const [tempStatFilters, setTempStatFilters] = useState({});
+  const [buildingName, setBuildingName] = useState('');
+  const [buildingLevel, setBuildingLevel] = useState('');
   const NFTsPerPage = 32;
+
+  // Valores predefinidos para building_name
+  const buildingNames = [
+    'Torre de Conquista',
+    'Forja',
+    'Mina',
+    'Árvore Milenar',
+    'Santuário de Treino',
+    'Torre de Quintessência',
+    'Torre da Vitória',
+    'Santuário Sagrado',
+    'Portão Dimensional',
+    'Santuário de Hidra'
+  ];
 
   // Status disponíveis para filtro
   const availableStats = [
@@ -34,7 +50,7 @@ const NFTList = () => {
 
   useEffect(() => {
     loadNFTs();
-  }, [currentPage, orderBy, orderDirection, statFilters]);
+  }, [currentPage, orderBy, orderDirection, statFilters, buildingName, buildingLevel]);
 
   const loadExchangeRate = async () => {
     const rate = await fetchWemixToBRL();
@@ -64,6 +80,14 @@ const NFTList = () => {
 
       if (statFiltersParam) {
         params.stat_filters = statFiltersParam;
+      }
+
+      // Adicionar filtros de Torre se estiverem preenchidos
+      if (buildingName) {
+        params.building_name = buildingName;
+      }
+      if (buildingLevel && buildingName) {
+        params.building_level = buildingLevel;
       }
 
       const data = await fetchNFTs(params);
@@ -131,6 +155,29 @@ const NFTList = () => {
   const clearAllStatFilters = () => {
     setStatFilters([]);
     setTempStatFilters({});
+    setCurrentPage(1);
+  };
+
+  const handleBuildingNameChange = (value) => {
+    setBuildingName(value);
+    // Limpar building_level se building_name for removido
+    if (!value) {
+      setBuildingLevel('');
+    }
+    setCurrentPage(1);
+  };
+
+  const handleBuildingLevelChange = (value) => {
+    // Só permite alterar se building_name estiver selecionado
+    if (buildingName) {
+      setBuildingLevel(value);
+      setCurrentPage(1);
+    }
+  };
+
+  const clearBuildingFilter = () => {
+    setBuildingName('');
+    setBuildingLevel('');
     setCurrentPage(1);
   };
 
@@ -221,6 +268,52 @@ const NFTList = () => {
               <option value="asc">Menor para Maior</option>
             </select>
           </div>
+        </div>
+
+        {/* Filtro de Torre */}
+        <div className="flex flex-wrap items-center gap-4">
+          <div className="flex items-center gap-2">
+            <label className="text-dark-textMuted text-sm font-medium">
+              Torre - Nome:
+            </label>
+            <select
+              value={buildingName}
+              onChange={(e) => handleBuildingNameChange(e.target.value)}
+              className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/50 hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all cursor-pointer"
+            >
+              <option value="">Selecione uma torre</option>
+              {buildingNames.map((name) => (
+                <option key={name} value={name}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-dark-textMuted text-sm font-medium">
+              Torre - Nível:
+            </label>
+            <input
+              type="number"
+              value={buildingLevel}
+              onChange={(e) => handleBuildingLevelChange(e.target.value)}
+              placeholder="Nível (min: 2)"
+              min="2"
+              step="1"
+              disabled={!buildingName}
+              className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white font-medium placeholder-dark-textMuted hover:bg-dark-bg/50 hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed w-32"
+            />
+          </div>
+
+          {(buildingName || buildingLevel) && (
+            <button
+              onClick={clearBuildingFilter}
+              className="px-3 py-2 bg-red-600/20 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium hover:bg-red-600/30 transition-all"
+            >
+              Limpar Torre
+            </button>
+          )}
         </div>
 
         {/* Filtro de Status */}
