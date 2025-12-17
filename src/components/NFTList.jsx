@@ -16,6 +16,9 @@ const NFTList = () => {
   const [tempStatFilters, setTempStatFilters] = useState({});
   const [buildingName, setBuildingName] = useState('');
   const [buildingLevel, setBuildingLevel] = useState('');
+  const [showBuildingFilterModal, setShowBuildingFilterModal] = useState(false);
+  const [tempBuildingName, setTempBuildingName] = useState('');
+  const [tempBuildingLevel, setTempBuildingLevel] = useState('');
   const NFTsPerPage = 32;
 
   // Valores predefinidos para building_name
@@ -158,21 +161,24 @@ const NFTList = () => {
     setCurrentPage(1);
   };
 
-  const handleBuildingNameChange = (value) => {
-    setBuildingName(value);
-    // Limpar building_level se building_name for removido
-    if (!value) {
-      setBuildingLevel('');
-    }
-    setCurrentPage(1);
+  const openBuildingFilterModal = () => {
+    // Inicializar valores temporários com os filtros atuais
+    setTempBuildingName(buildingName);
+    setTempBuildingLevel(buildingLevel);
+    setShowBuildingFilterModal(true);
   };
 
-  const handleBuildingLevelChange = (value) => {
-    // Só permite alterar se building_name estiver selecionado
-    if (buildingName) {
-      setBuildingLevel(value);
-      setCurrentPage(1);
-    }
+  const closeBuildingFilterModal = () => {
+    setShowBuildingFilterModal(false);
+    setTempBuildingName('');
+    setTempBuildingLevel('');
+  };
+
+  const applyBuildingFilter = () => {
+    setBuildingName(tempBuildingName);
+    setBuildingLevel(tempBuildingName ? tempBuildingLevel : '');
+    setCurrentPage(1);
+    closeBuildingFilterModal();
   };
 
   const clearBuildingFilter = () => {
@@ -270,42 +276,21 @@ const NFTList = () => {
           </div>
         </div>
 
-        {/* Filtro de Torre */}
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2">
-            <label className="text-dark-textMuted text-sm font-medium">
-              Torre - Nome:
-            </label>
-            <select
-              value={buildingName}
-              onChange={(e) => handleBuildingNameChange(e.target.value)}
-              className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/50 hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all cursor-pointer"
-            >
-              <option value="">Selecione uma torre</option>
-              {buildingNames.map((name) => (
-                <option key={name} value={name}>
-                  {name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-dark-textMuted text-sm font-medium">
-              Torre - Nível:
-            </label>
-            <input
-              type="number"
-              value={buildingLevel}
-              onChange={(e) => handleBuildingLevelChange(e.target.value)}
-              placeholder="Nível (min: 2)"
-              min="2"
-              step="1"
-              disabled={!buildingName}
-              className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white font-medium placeholder-dark-textMuted hover:bg-dark-bg/50 hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed w-32"
-            />
-          </div>
-
+        {/* Filtros */}
+        <div className="flex items-center gap-4">
+          {/* Filtro de Torre */}
+          <button
+            onClick={openBuildingFilterModal}
+            className="px-4 py-2 bg-cyan-600/20 border border-cyan-500/50 rounded-lg text-cyan-400 font-medium hover:bg-cyan-600/30 transition-all flex items-center gap-2"
+          >
+            <span>🏰</span>
+            <span>Filtro de Torre</span>
+            {(buildingName || buildingLevel) && (
+              <span className="bg-cyan-600 text-white text-xs px-2 py-0.5 rounded-full">
+                1
+              </span>
+            )}
+          </button>
           {(buildingName || buildingLevel) && (
             <button
               onClick={clearBuildingFilter}
@@ -314,10 +299,8 @@ const NFTList = () => {
               Limpar Torre
             </button>
           )}
-        </div>
 
-        {/* Filtro de Status */}
-        <div className="flex items-center gap-4">
+          {/* Filtro de Status */}
           <button
             onClick={openStatFilterModal}
             className="px-4 py-2 bg-purple-600/20 border border-purple-500/50 rounded-lg text-purple-400 font-medium hover:bg-purple-600/30 transition-all flex items-center gap-2"
@@ -340,6 +323,90 @@ const NFTList = () => {
           )}
         </div>
       </div>
+
+      {/* Modal de Filtro de Torre */}
+      {showBuildingFilterModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeBuildingFilterModal}>
+          <div 
+            className="bg-dark-card border border-dark-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header do Modal */}
+            <div className="p-6 border-b border-dark-border">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Filtro de Torre</h2>
+                <button
+                  onClick={closeBuildingFilterModal}
+                  className="text-dark-textMuted hover:text-white transition-colors text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-dark-textMuted text-sm mt-2">
+                Selecione o nome da torre e o nível desejado.
+              </p>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-white font-medium mb-2 text-sm">
+                  Nome da Torre
+                </label>
+                <select
+                  value={tempBuildingName}
+                  onChange={(e) => {
+                    setTempBuildingName(e.target.value);
+                    if (!e.target.value) {
+                      setTempBuildingLevel('');
+                    }
+                  }}
+                  className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 hover:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all cursor-pointer"
+                >
+                  <option value="">Selecione uma torre</option>
+                  {buildingNames.map((name) => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-white font-medium mb-2 text-sm">
+                  Nível da Torre
+                </label>
+                <input
+                  type="number"
+                  value={tempBuildingLevel}
+                  onChange={(e) => setTempBuildingLevel(e.target.value)}
+                  placeholder="Nível (mínimo: 2)"
+                  min="2"
+                  step="1"
+                  disabled={!tempBuildingName}
+                  className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium placeholder-dark-textMuted hover:bg-dark-bg/80 hover:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+              </div>
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="p-6 border-t border-dark-border flex items-center justify-end gap-3">
+              <button
+                onClick={closeBuildingFilterModal}
+                className="px-6 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={applyBuildingFilter}
+                className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white font-medium transition-all"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Filtros de Status */}
       {showStatFilterModal && (
