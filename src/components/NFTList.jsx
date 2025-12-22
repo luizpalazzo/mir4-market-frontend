@@ -22,7 +22,25 @@ const NFTList = () => {
   const [charClass, setCharClass] = useState('');
   const [showCharClassFilterModal, setShowCharClassFilterModal] = useState(false);
   const [tempCharClass, setTempCharClass] = useState('');
+  const [level, setLevel] = useState('');
+  const [showLevelFilterModal, setShowLevelFilterModal] = useState(false);
+  const [tempLevel, setTempLevel] = useState('');
+  const [powerMin, setPowerMin] = useState('');
+  const [showPowerFilterModal, setShowPowerFilterModal] = useState(false);
+  const [tempPowerMin, setTempPowerMin] = useState('');
+  const [server, setServer] = useState('');
+  const [showServerFilterModal, setShowServerFilterModal] = useState(false);
+  const [tempServer, setTempServer] = useState('');
   const NFTsPerPage = 32;
+
+  // Servidores disponíveis
+  const servers = [
+    { name: 'NA', value: 'NA' },
+    { name: 'SA', value: 'SA' },
+    { name: 'EU', value: 'EU' },
+    { name: 'ASIA', value: 'ASIA' },
+    { name: 'INMENA', value: 'INMENA' },
+  ];
 
   // Mapeamento de classes (nome -> número)
   const charClasses = [
@@ -59,6 +77,16 @@ const NFTList = () => {
     { name: 'EVASÃO', key: 'EVASÃO' },
     { name: 'CRÍTICO', key: 'CRÍTICO' },
     { name: 'EVASÃO DE CRÍTICO', key: 'EVASÃO DE CRÍTICO' },
+    { name: 'Aumento do DANO DE ATAQUE CRÍTICO', key: 'Aumento do DANO DE ATAQUE CRÍTICO' },
+    { name: 'Redução do DANO CRÍTICO Recebido', key: 'Redução do DANO CRÍTICO Recebido' },
+    { name: 'Aumento do DANO DE ATAQUE de Esmagamento', key: 'Aumento do DANO DE ATAQUE de Esmagamento' },
+    { name: 'Redução do DANO de Esmagamento Recebido', key: 'Redução do DANO de Esmagamento Recebido' },
+    { name: 'Aumento do DANO DE ATAQUE em PvP', key: 'Aumento do DANO DE ATAQUE em PvP' },
+    { name: 'Redução do DANO em PvP Recebido', key: 'Redução do DANO em PvP Recebido' },
+    { name: 'Aumento de DANO DE ATAQUE de Habilidade', key: 'Aumento de DANO DE ATAQUE de Habilidade' },
+    { name: 'Redução do DANO de Habilidade Recebido', key: 'Redução do DANO de Habilidade Recebido' },
+    { name: 'Aumento de Todo o DANO DE ATAQUE', key: 'Aumento de Todo o DANO DE ATAQUE' },
+    { name: 'Redução de Todo o DANO Recebido', key: 'Redução de Todo o DANO Recebido' },
   ];
 
   useEffect(() => {
@@ -67,7 +95,7 @@ const NFTList = () => {
 
   useEffect(() => {
     loadNFTs();
-  }, [currentPage, orderBy, orderDirection, statFilters, buildingName, buildingLevel, charClass]);
+  }, [currentPage, orderBy, orderDirection, statFilters, buildingName, buildingLevel, charClass, level, powerMin, server]);
 
   const loadExchangeRate = async () => {
     const rate = await fetchWemixToBRL();
@@ -112,6 +140,21 @@ const NFTList = () => {
         params.char_class = charClass;
       }
 
+      // Adicionar filtro de level se estiver preenchido
+      if (level) {
+        params.level = level;
+      }
+
+      // Adicionar filtro de poder mínimo se estiver preenchido
+      if (powerMin) {
+        params.power_min = powerMin;
+      }
+
+      // Adicionar filtro de servidor se estiver selecionado
+      if (server) {
+        params.server = server;
+      }
+
       const data = await fetchNFTs(params);
       setNfts(data);
     } catch (err) {
@@ -150,6 +193,69 @@ const NFTList = () => {
 
   const clearCharClassFilter = () => {
     setCharClass('');
+    setCurrentPage(1);
+  };
+
+  const openLevelFilterModal = () => {
+    setTempLevel(level);
+    setShowLevelFilterModal(true);
+  };
+
+  const closeLevelFilterModal = () => {
+    setShowLevelFilterModal(false);
+    setTempLevel('');
+  };
+
+  const applyLevelFilter = () => {
+    setLevel(tempLevel);
+    setCurrentPage(1);
+    closeLevelFilterModal();
+  };
+
+  const clearLevelFilter = () => {
+    setLevel('');
+    setCurrentPage(1);
+  };
+
+  const openPowerFilterModal = () => {
+    setTempPowerMin(powerMin);
+    setShowPowerFilterModal(true);
+  };
+
+  const closePowerFilterModal = () => {
+    setShowPowerFilterModal(false);
+    setTempPowerMin('');
+  };
+
+  const applyPowerFilter = () => {
+    setPowerMin(tempPowerMin);
+    setCurrentPage(1);
+    closePowerFilterModal();
+  };
+
+  const clearPowerFilter = () => {
+    setPowerMin('');
+    setCurrentPage(1);
+  };
+
+  const openServerFilterModal = () => {
+    setTempServer(server);
+    setShowServerFilterModal(true);
+  };
+
+  const closeServerFilterModal = () => {
+    setShowServerFilterModal(false);
+    setTempServer('');
+  };
+
+  const applyServerFilter = () => {
+    setServer(tempServer);
+    setCurrentPage(1);
+    closeServerFilterModal();
+  };
+
+  const clearServerFilter = () => {
+    setServer('');
     setCurrentPage(1);
   };
 
@@ -362,6 +468,72 @@ const NFTList = () => {
             </button>
           )}
 
+          {/* Filtro de Level */}
+          <button
+            onClick={openLevelFilterModal}
+            className="px-4 py-2 bg-yellow-600/20 border border-yellow-500/50 rounded-lg text-yellow-400 font-medium hover:bg-yellow-600/30 transition-all flex items-center gap-2"
+          >
+            <span>📊</span>
+            <span>Filtro de Level</span>
+            {level && (
+              <span className="bg-yellow-600 text-white text-xs px-2 py-0.5 rounded-full">
+                1
+              </span>
+            )}
+          </button>
+          {level && (
+            <button
+              onClick={clearLevelFilter}
+              className="px-3 py-2 bg-red-600/20 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium hover:bg-red-600/30 transition-all"
+            >
+              Limpar Level
+            </button>
+          )}
+
+          {/* Filtro de Poder */}
+          <button
+            onClick={openPowerFilterModal}
+            className="px-4 py-2 bg-pink-600/20 border border-pink-500/50 rounded-lg text-pink-400 font-medium hover:bg-pink-600/30 transition-all flex items-center gap-2"
+          >
+            <span>💪</span>
+            <span>Filtro de Poder</span>
+            {powerMin && (
+              <span className="bg-pink-600 text-white text-xs px-2 py-0.5 rounded-full">
+                1
+              </span>
+            )}
+          </button>
+          {powerMin && (
+            <button
+              onClick={clearPowerFilter}
+              className="px-3 py-2 bg-red-600/20 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium hover:bg-red-600/30 transition-all"
+            >
+              Limpar Poder
+            </button>
+          )}
+
+          {/* Filtro de Servidor */}
+          <button
+            onClick={openServerFilterModal}
+            className="px-4 py-2 bg-indigo-600/20 border border-indigo-500/50 rounded-lg text-indigo-400 font-medium hover:bg-indigo-600/30 transition-all flex items-center gap-2"
+          >
+            <span>🌐</span>
+            <span>Filtro de Servidor</span>
+            {server && (
+              <span className="bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">
+                1
+              </span>
+            )}
+          </button>
+          {server && (
+            <button
+              onClick={clearServerFilter}
+              className="px-3 py-2 bg-red-600/20 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium hover:bg-red-600/30 transition-all"
+            >
+              Limpar Servidor
+            </button>
+          )}
+
           {/* Filtro de Status */}
           <button
             onClick={openStatFilterModal}
@@ -525,6 +697,189 @@ const NFTList = () => {
               <button
                 onClick={applyCharClassFilter}
                 className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium transition-all"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Filtro de Level */}
+      {showLevelFilterModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeLevelFilterModal}>
+          <div 
+            className="bg-dark-card border border-dark-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header do Modal */}
+            <div className="p-6 border-b border-dark-border">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Filtro de Level</h2>
+                <button
+                  onClick={closeLevelFilterModal}
+                  className="text-dark-textMuted hover:text-white transition-colors text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-dark-textMuted text-sm mt-2">
+                Informe o level desejado.
+              </p>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6">
+              <div>
+                <label className="block text-white font-medium mb-2 text-sm">
+                  Level
+                </label>
+                <input
+                  type="number"
+                  value={tempLevel}
+                  onChange={(e) => setTempLevel(e.target.value)}
+                  placeholder="Digite o level (ex: 80)"
+                  min="1"
+                  step="1"
+                  className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium placeholder-dark-textMuted hover:bg-dark-bg/80 hover:border-yellow-500/50 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 focus:border-yellow-500/50 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="p-6 border-t border-dark-border flex items-center justify-end gap-3">
+              <button
+                onClick={closeLevelFilterModal}
+                className="px-6 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={applyLevelFilter}
+                className="px-6 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-white font-medium transition-all"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Filtro de Poder */}
+      {showPowerFilterModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closePowerFilterModal}>
+          <div 
+            className="bg-dark-card border border-dark-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header do Modal */}
+            <div className="p-6 border-b border-dark-border">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Filtro de Poder</h2>
+                <button
+                  onClick={closePowerFilterModal}
+                  className="text-dark-textMuted hover:text-white transition-colors text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-dark-textMuted text-sm mt-2">
+                Informe o poder mínimo desejado.
+              </p>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6">
+              <div>
+                <label className="block text-white font-medium mb-2 text-sm">
+                  Poder Mínimo
+                </label>
+                <input
+                  type="number"
+                  value={tempPowerMin}
+                  onChange={(e) => setTempPowerMin(e.target.value)}
+                  placeholder="Digite o poder mínimo (ex: 100000)"
+                  min="0"
+                  step="1"
+                  className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium placeholder-dark-textMuted hover:bg-dark-bg/80 hover:border-pink-500/50 focus:outline-none focus:ring-2 focus:ring-pink-500/50 focus:border-pink-500/50 transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="p-6 border-t border-dark-border flex items-center justify-end gap-3">
+              <button
+                onClick={closePowerFilterModal}
+                className="px-6 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={applyPowerFilter}
+                className="px-6 py-2 bg-pink-600 hover:bg-pink-700 rounded-lg text-white font-medium transition-all"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Filtro de Servidor */}
+      {showServerFilterModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeServerFilterModal}>
+          <div 
+            className="bg-dark-card border border-dark-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header do Modal */}
+            <div className="p-6 border-b border-dark-border">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Filtro de Servidor</h2>
+                <button
+                  onClick={closeServerFilterModal}
+                  className="text-dark-textMuted hover:text-white transition-colors text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-dark-textMuted text-sm mt-2">
+                Selecione o servidor desejado.
+              </p>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6">
+              <div>
+                <label className="block text-white font-medium mb-2 text-sm">
+                  Servidor
+                </label>
+                <select
+                  value={tempServer}
+                  onChange={(e) => setTempServer(e.target.value)}
+                  className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 hover:border-indigo-500/50 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 transition-all cursor-pointer"
+                >
+                  <option value="">Todos os servidores</option>
+                  {servers.map((serverOption) => (
+                    <option key={serverOption.value} value={serverOption.value}>
+                      {serverOption.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="p-6 border-t border-dark-border flex items-center justify-end gap-3">
+              <button
+                onClick={closeServerFilterModal}
+                className="px-6 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={applyServerFilter}
+                className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-medium transition-all"
               >
                 OK
               </button>

@@ -41,6 +41,37 @@ const NFTCard = ({ nft, wemixToBRL }) => {
     return classImageMap[classStr] || null;
   };
 
+  // Converter tier para número romano
+  const getRomanNumeral = (num) => {
+    const romanMap = {
+      1: 'I',
+      2: 'II',
+      3: 'III',
+      4: 'IV',
+      5: 'V',
+      6: 'VI',
+      7: 'VII',
+      8: 'VIII',
+      9: 'IX',
+      10: 'X'
+    };
+    return romanMap[num] || num?.toString() || '';
+  };
+
+  // Obter cor de fundo baseada no grade
+  const getGradeColor = (grade) => {
+    const gradeColorMap = {
+      '1': 'bg-gray-500/30', // cinza
+      '2': 'bg-green-500/30', // verde
+      '3': 'bg-blue-500/30', // azul
+      '4': 'bg-red-500/30', // vermelho
+      '5': 'bg-yellow-500/30', // amarelo
+      '6': 'bg-orange-500/30', // laranja
+    };
+    const gradeStr = grade?.toString();
+    return gradeColorMap[gradeStr] || 'bg-dark-bg/50';
+  };
+
   // Função para buscar status específicos
   const getStatusValue = (statName) => {
     if (!nft.status?.raw_status?.lists) return null;
@@ -61,12 +92,27 @@ const NFTCard = ({ nft, wemixToBRL }) => {
     { name: 'EVASÃO', key: 'EVASÃO' },
     { name: 'CRÍTICO', key: 'CRÍTICO' },
     { name: 'EVASÃO DE CRÍTICO', key: 'EVASÃO DE CRÍTICO' },
+    { name: 'Aumento do DANO DE ATAQUE CRÍTICO', key: 'Aumento do DANO DE ATAQUE CRÍTICO' },
+    { name: 'Redução do DANO CRÍTICO Recebido', key: 'Redução do DANO CRÍTICO Recebido' },
+    { name: 'Aumento do DANO DE ATAQUE de Esmagamento', key: 'Aumento do DANO DE ATAQUE de Esmagamento' },
+    { name: 'Redução do DANO de Esmagamento Recebido', key: 'Redução do DANO de Esmagamento Recebido' },
+    { name: 'Aumento do DANO DE ATAQUE em PvP', key: 'Aumento do DANO DE ATAQUE em PvP' },
+    { name: 'Redução do DANO em PvP Recebido', key: 'Redução do DANO em PvP Recebido' },
+    { name: 'Aumento de DANO DE ATAQUE de Habilidade', key: 'Aumento de DANO DE ATAQUE de Habilidade' },
+    { name: 'Redução do DANO de Habilidade Recebido', key: 'Redução do DANO de Habilidade Recebido' },
+    { name: 'Aumento de Todo o DANO DE ATAQUE', key: 'Aumento de Todo o DANO DE ATAQUE' },
+    { name: 'Redução de Todo o DANO Recebido', key: 'Redução de Todo o DANO Recebido' },
   ];
 
   const priceInWemix = nft.price;
   const priceInBRL = wemixToBRL && priceInWemix 
     ? priceInWemix * wemixToBRL 
     : null;
+
+  // Debug: verificar se equipItem existe
+  if (nft.equipItem || nft.equipItems) {
+    console.log('EquipItems encontrados:', nft.equipItem || nft.equipItems);
+  }
 
   const handleCardClick = () => {
     setShowModal(true);
@@ -112,167 +158,81 @@ const NFTCard = ({ nft, wemixToBRL }) => {
           <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
             {nft.name || 'Sem nome'}
           </h3>
-          {/* Imagem da Classe com Overlay de Itens Equipados */}
+          {/* Imagem da Classe */}
           {nft.char_class && getClassImage(nft.char_class) && (
             <div className="mt-3 flex justify-center">
-              <div className="relative w-full max-w-xs">
-                {/* Imagem do Personagem */}
-                <img
-                  src={getClassImage(nft.char_class)}
-                  alt={`Classe ${nft.char_class}`}
-                  className="max-w-full h-auto max-h-48 object-contain rounded-lg mx-auto"
-                  onError={(e) => {
-                    e.target.style.display = 'none';
-                  }}
-                />
-                
-                {/* Overlay de Itens Equipados */}
-                {nft.equipItem && (
-                  <div className="absolute inset-0 pointer-events-none">
-                    {/* Item 1 - Arma (Topo Esquerdo) */}
-                    {nft.equipItem['1'] && (
-                      <div className="absolute top-0 left-0 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['1'].itemPath}
-                          alt={nft.equipItem['1'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 2 - Colar (Topo Centro) */}
-                    {nft.equipItem['2'] && (
-                      <div className="absolute top-0 left-1/2 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['2'].itemPath}
-                          alt={nft.equipItem['2'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 3 - Pulseira (Direita Superior) */}
-                    {nft.equipItem['3'] && (
-                      <div className="absolute top-1/4 right-0 w-10 h-10 translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['3'].itemPath}
-                          alt={nft.equipItem['3'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 4 - Anel (Direita Centro) */}
-                    {nft.equipItem['4'] && (
-                      <div className="absolute top-1/2 right-0 w-10 h-10 translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['4'].itemPath}
-                          alt={nft.equipItem['4'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 5 - Torso (Centro - sobreposto levemente) */}
-                    {nft.equipItem['5'] && (
-                      <div className="absolute top-1/3 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2 z-10">
-                        <img
-                          src={nft.equipItem['5'].itemPath}
-                          alt={nft.equipItem['5'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 6 - Pernas (Embaixo Centro) */}
-                    {nft.equipItem['6'] && (
-                      <div className="absolute bottom-1/4 left-1/2 w-10 h-10 -translate-x-1/2 translate-y-1/2">
-                        <img
-                          src={nft.equipItem['6'].itemPath}
-                          alt={nft.equipItem['6'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 7 - Luvas (Esquerda Centro) */}
-                    {nft.equipItem['7'] && (
-                      <div className="absolute top-1/2 left-0 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['7'].itemPath}
-                          alt={nft.equipItem['7'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 8 - Botas (Embaixo) */}
-                    {nft.equipItem['8'] && (
-                      <div className="absolute bottom-0 left-1/2 w-10 h-10 -translate-x-1/2 translate-y-1/2">
-                        <img
-                          src={nft.equipItem['8'].itemPath}
-                          alt={nft.equipItem['8'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 9 - Sub-arma (Esquerda Superior) */}
-                    {nft.equipItem['9'] && (
-                      <div className="absolute top-1/4 left-0 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['9'].itemPath}
-                          alt={nft.equipItem['9'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                    
-                    {/* Item 10 - Brincos (Topo Direito) */}
-                    {nft.equipItem['10'] && (
-                      <div className="absolute top-0 right-0 w-10 h-10 translate-x-1/2 -translate-y-1/2">
-                        <img
-                          src={nft.equipItem['10'].itemPath}
-                          alt={nft.equipItem['10'].itemName}
-                          className="w-full h-full object-contain drop-shadow-lg"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
+              <img
+                src={getClassImage(nft.char_class)}
+                alt={`Classe ${nft.char_class}`}
+                className="max-w-full h-auto max-h-48 object-contain rounded-lg"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
             </div>
           )}
+
+          {/* Itens Equipados */}
+          {(() => {
+            const equipItems = nft.equipItem || nft.equipItems;
+            if (!equipItems) return null;
+            
+            // Criar array de itens de 1 a 10
+            const itemsToShow = [];
+            for (let i = 1; i <= 10; i++) {
+              if (equipItems[i.toString()] || equipItems[i]) {
+                itemsToShow.push({
+                  key: i.toString(),
+                  item: equipItems[i.toString()] || equipItems[i]
+                });
+              }
+            }
+            
+            if (itemsToShow.length === 0) return null;
+            
+            return (
+              <div className="mt-3 pt-3 border-t border-dark-border">
+                <div className="text-dark-textMuted text-xs uppercase tracking-wide mb-2">
+                  Equipamentos
+                </div>
+                <div className="grid grid-cols-5 gap-2">
+                  {itemsToShow.map((itemData) => {
+                    const gradeColor = getGradeColor(itemData.item.grade);
+                    const tierRoman = getRomanNumeral(parseInt(itemData.item.tier));
+                    const enhance = parseInt(itemData.item.enhance) || 0;
+                    
+                    return (
+                      <div
+                        key={itemData.key}
+                        className={`${gradeColor} rounded-lg p-1.5 border border-dark-border/50 hover:border-purple-500/50 transition-all relative`}
+                      >
+                        <img
+                          src={itemData.item.itemPath}
+                          alt={itemData.item.itemName}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                        {/* Enhance */}
+                        {enhance > 0 && (
+                          <div className="absolute top-0 right-0 bg-purple-600/90 text-white text-[10px] font-bold px-1 rounded-bl border border-purple-500/50">
+                            +{enhance}
+                          </div>
+                        )}
+                        {/* Tier em romano */}
+                        {tierRoman && (
+                          <div className="absolute bottom-0 right-0 bg-dark-card/90 text-white text-[10px] font-bold px-1 rounded-tl border border-dark-border/50">
+                            {tierRoman}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* World Name */}
