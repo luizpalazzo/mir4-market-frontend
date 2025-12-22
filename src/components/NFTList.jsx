@@ -20,6 +20,8 @@ const NFTList = () => {
   const [tempBuildingName, setTempBuildingName] = useState('');
   const [tempBuildingLevel, setTempBuildingLevel] = useState('');
   const [charClass, setCharClass] = useState('');
+  const [showCharClassFilterModal, setShowCharClassFilterModal] = useState(false);
+  const [tempCharClass, setTempCharClass] = useState('');
   const NFTsPerPage = 32;
 
   // Mapeamento de classes (nome -> número)
@@ -130,8 +132,24 @@ const NFTList = () => {
     setCurrentPage(1);
   };
 
-  const handleCharClassChange = (value) => {
-    setCharClass(value);
+  const openCharClassFilterModal = () => {
+    setTempCharClass(charClass);
+    setShowCharClassFilterModal(true);
+  };
+
+  const closeCharClassFilterModal = () => {
+    setShowCharClassFilterModal(false);
+    setTempCharClass('');
+  };
+
+  const applyCharClassFilter = () => {
+    setCharClass(tempCharClass);
+    setCurrentPage(1);
+    closeCharClassFilterModal();
+  };
+
+  const clearCharClassFilter = () => {
+    setCharClass('');
     setCurrentPage(1);
   };
 
@@ -296,24 +314,6 @@ const NFTList = () => {
               <option value="asc">Menor para Maior</option>
             </select>
           </div>
-
-          <div className="flex items-center gap-2">
-            <label className="text-dark-textMuted text-sm font-medium">
-              Classe:
-            </label>
-            <select
-              value={charClass}
-              onChange={(e) => handleCharClassChange(e.target.value)}
-              className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/50 hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all cursor-pointer"
-            >
-              <option value="">Todas as classes</option>
-              {charClasses.map((charClassOption) => (
-                <option key={charClassOption.value} value={charClassOption.value}>
-                  {charClassOption.name}
-                </option>
-              ))}
-            </select>
-          </div>
         </div>
 
         {/* Filtros */}
@@ -337,6 +337,28 @@ const NFTList = () => {
               className="px-3 py-2 bg-red-600/20 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium hover:bg-red-600/30 transition-all"
             >
               Limpar Torre
+            </button>
+          )}
+
+          {/* Filtro de Classe */}
+          <button
+            onClick={openCharClassFilterModal}
+            className="px-4 py-2 bg-green-600/20 border border-green-500/50 rounded-lg text-green-400 font-medium hover:bg-green-600/30 transition-all flex items-center gap-2"
+          >
+            <span>⚔️</span>
+            <span>Filtro de Classe</span>
+            {charClass && (
+              <span className="bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
+                1
+              </span>
+            )}
+          </button>
+          {charClass && (
+            <button
+              onClick={clearCharClassFilter}
+              className="px-3 py-2 bg-red-600/20 border border-red-500/50 rounded-lg text-red-400 text-sm font-medium hover:bg-red-600/30 transition-all"
+            >
+              Limpar Classe
             </button>
           )}
 
@@ -440,6 +462,69 @@ const NFTList = () => {
               <button
                 onClick={applyBuildingFilter}
                 className="px-6 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-white font-medium transition-all"
+              >
+                OK
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Filtro de Classe */}
+      {showCharClassFilterModal && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={closeCharClassFilterModal}>
+          <div 
+            className="bg-dark-card border border-dark-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header do Modal */}
+            <div className="p-6 border-b border-dark-border">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-white">Filtro de Classe</h2>
+                <button
+                  onClick={closeCharClassFilterModal}
+                  className="text-dark-textMuted hover:text-white transition-colors text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-dark-textMuted text-sm mt-2">
+                Selecione a classe desejada.
+              </p>
+            </div>
+
+            {/* Conteúdo do Modal */}
+            <div className="p-6">
+              <div>
+                <label className="block text-white font-medium mb-2 text-sm">
+                  Classe
+                </label>
+                <select
+                  value={tempCharClass}
+                  onChange={(e) => setTempCharClass(e.target.value)}
+                  className="w-full px-4 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 hover:border-green-500/50 focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500/50 transition-all cursor-pointer"
+                >
+                  <option value="">Todas as classes</option>
+                  {charClasses.map((charClassOption) => (
+                    <option key={charClassOption.value} value={charClassOption.value}>
+                      {charClassOption.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Footer do Modal */}
+            <div className="p-6 border-t border-dark-border flex items-center justify-end gap-3">
+              <button
+                onClick={closeCharClassFilterModal}
+                className="px-6 py-2 bg-dark-bg border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/80 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={applyCharClassFilter}
+                className="px-6 py-2 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium transition-all"
               >
                 OK
               </button>
