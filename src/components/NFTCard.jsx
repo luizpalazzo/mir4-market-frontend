@@ -25,6 +25,22 @@ const NFTCard = ({ nft, wemixToBRL }) => {
     return new Intl.NumberFormat('pt-BR').format(num);
   };
 
+  // Mapeamento de classe para URL da imagem
+  const getClassImage = (charClass) => {
+    const classImageMap = {
+      '1': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-warrior2.webp', // Guerreiro
+      '2': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-sorcerer2.webp', // Maga
+      '3': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-taoist2.webp', // Taoista
+      '4': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-arbalist2.webp', // Arqueira
+      '5': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-lancer2.webp', // Lanceiro
+      '6': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-darkist3.webp', // Soturna
+      '7': 'https://file.mir4global.com/xdraco/img/common/nft-detail/nft-detail-lionheart3.webp', // Coração de Leão
+    };
+    
+    const classStr = charClass?.toString();
+    return classImageMap[classStr] || null;
+  };
+
   // Função para buscar status específicos
   const getStatusValue = (statName) => {
     if (!nft.status?.raw_status?.lists) return null;
@@ -96,6 +112,19 @@ const NFTCard = ({ nft, wemixToBRL }) => {
           <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
             {nft.name || 'Sem nome'}
           </h3>
+          {/* Imagem da Classe */}
+          {nft.char_class && getClassImage(nft.char_class) && (
+            <div className="mt-3 flex justify-center">
+              <img
+                src={getClassImage(nft.char_class)}
+                alt={`Classe ${nft.char_class}`}
+                className="max-w-full h-auto max-h-48 object-contain rounded-lg"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* World Name */}
