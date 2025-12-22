@@ -3,7 +3,7 @@ const GATEIO_API = 'https://api.gateio.ws/api/v4/spot/tickers?currency_pair=WEMI
 const AWESOME_API = 'https://economia.awesomeapi.com.br/json/last/USD-BRL';
 
 // Taxa de fallback (última taxa conhecida)
-const FALLBACK_RATE = 2.10;
+const FALLBACK_RATE = 2.15;
 
 export const fetchWemixToBRL = async () => {
   try {

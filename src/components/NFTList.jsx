@@ -19,7 +19,19 @@ const NFTList = () => {
   const [showBuildingFilterModal, setShowBuildingFilterModal] = useState(false);
   const [tempBuildingName, setTempBuildingName] = useState('');
   const [tempBuildingLevel, setTempBuildingLevel] = useState('');
+  const [charClass, setCharClass] = useState('');
   const NFTsPerPage = 32;
+
+  // Mapeamento de classes (nome -> número)
+  const charClasses = [
+    { name: 'Guerreiro', value: '1' },
+    { name: 'Maga', value: '2' },
+    { name: 'Taoista', value: '3' },
+    { name: 'Arqueira', value: '4' },
+    { name: 'Lanceiro', value: '5' },
+    { name: 'Soturna', value: '6' },
+    { name: 'Coração de Leão', value: '7' },
+  ];
 
   // Valores predefinidos para building_name
   const buildingNames = [
@@ -53,7 +65,7 @@ const NFTList = () => {
 
   useEffect(() => {
     loadNFTs();
-  }, [currentPage, orderBy, orderDirection, statFilters, buildingName, buildingLevel]);
+  }, [currentPage, orderBy, orderDirection, statFilters, buildingName, buildingLevel, charClass]);
 
   const loadExchangeRate = async () => {
     const rate = await fetchWemixToBRL();
@@ -93,6 +105,11 @@ const NFTList = () => {
         params.building_level = buildingLevel;
       }
 
+      // Adicionar filtro de classe se estiver selecionado
+      if (charClass) {
+        params.char_class = charClass;
+      }
+
       const data = await fetchNFTs(params);
       setNfts(data);
     } catch (err) {
@@ -110,6 +127,11 @@ const NFTList = () => {
 
   const handleOrderDirectionChange = (newDirection) => {
     setOrderDirection(newDirection);
+    setCurrentPage(1);
+  };
+
+  const handleCharClassChange = (value) => {
+    setCharClass(value);
     setCurrentPage(1);
   };
 
@@ -272,6 +294,24 @@ const NFTList = () => {
             >
               <option value="desc">Maior para Menor</option>
               <option value="asc">Menor para Maior</option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <label className="text-dark-textMuted text-sm font-medium">
+              Classe:
+            </label>
+            <select
+              value={charClass}
+              onChange={(e) => handleCharClassChange(e.target.value)}
+              className="px-4 py-2 bg-dark-card border border-dark-border rounded-lg text-white font-medium hover:bg-dark-bg/50 hover:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all cursor-pointer"
+            >
+              <option value="">Todas as classes</option>
+              {charClasses.map((charClassOption) => (
+                <option key={charClassOption.value} value={charClassOption.value}>
+                  {charClassOption.name}
+                </option>
+              ))}
             </select>
           </div>
         </div>
