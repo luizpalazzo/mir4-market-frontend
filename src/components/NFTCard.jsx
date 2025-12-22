@@ -112,17 +112,165 @@ const NFTCard = ({ nft, wemixToBRL }) => {
           <h3 className="text-xl font-bold text-white group-hover:text-purple-400 transition-colors">
             {nft.name || 'Sem nome'}
           </h3>
-          {/* Imagem da Classe */}
+          {/* Imagem da Classe com Overlay de Itens Equipados */}
           {nft.char_class && getClassImage(nft.char_class) && (
             <div className="mt-3 flex justify-center">
-              <img
-                src={getClassImage(nft.char_class)}
-                alt={`Classe ${nft.char_class}`}
-                className="max-w-full h-auto max-h-48 object-contain rounded-lg"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                }}
-              />
+              <div className="relative w-full max-w-xs">
+                {/* Imagem do Personagem */}
+                <img
+                  src={getClassImage(nft.char_class)}
+                  alt={`Classe ${nft.char_class}`}
+                  className="max-w-full h-auto max-h-48 object-contain rounded-lg mx-auto"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                  }}
+                />
+                
+                {/* Overlay de Itens Equipados */}
+                {nft.equipItem && (
+                  <div className="absolute inset-0 pointer-events-none">
+                    {/* Item 1 - Arma (Topo Esquerdo) */}
+                    {nft.equipItem['1'] && (
+                      <div className="absolute top-0 left-0 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['1'].itemPath}
+                          alt={nft.equipItem['1'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 2 - Colar (Topo Centro) */}
+                    {nft.equipItem['2'] && (
+                      <div className="absolute top-0 left-1/2 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['2'].itemPath}
+                          alt={nft.equipItem['2'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 3 - Pulseira (Direita Superior) */}
+                    {nft.equipItem['3'] && (
+                      <div className="absolute top-1/4 right-0 w-10 h-10 translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['3'].itemPath}
+                          alt={nft.equipItem['3'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 4 - Anel (Direita Centro) */}
+                    {nft.equipItem['4'] && (
+                      <div className="absolute top-1/2 right-0 w-10 h-10 translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['4'].itemPath}
+                          alt={nft.equipItem['4'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 5 - Torso (Centro - sobreposto levemente) */}
+                    {nft.equipItem['5'] && (
+                      <div className="absolute top-1/3 left-1/2 w-12 h-12 -translate-x-1/2 -translate-y-1/2 z-10">
+                        <img
+                          src={nft.equipItem['5'].itemPath}
+                          alt={nft.equipItem['5'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 6 - Pernas (Embaixo Centro) */}
+                    {nft.equipItem['6'] && (
+                      <div className="absolute bottom-1/4 left-1/2 w-10 h-10 -translate-x-1/2 translate-y-1/2">
+                        <img
+                          src={nft.equipItem['6'].itemPath}
+                          alt={nft.equipItem['6'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 7 - Luvas (Esquerda Centro) */}
+                    {nft.equipItem['7'] && (
+                      <div className="absolute top-1/2 left-0 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['7'].itemPath}
+                          alt={nft.equipItem['7'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 8 - Botas (Embaixo) */}
+                    {nft.equipItem['8'] && (
+                      <div className="absolute bottom-0 left-1/2 w-10 h-10 -translate-x-1/2 translate-y-1/2">
+                        <img
+                          src={nft.equipItem['8'].itemPath}
+                          alt={nft.equipItem['8'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 9 - Sub-arma (Esquerda Superior) */}
+                    {nft.equipItem['9'] && (
+                      <div className="absolute top-1/4 left-0 w-10 h-10 -translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['9'].itemPath}
+                          alt={nft.equipItem['9'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                    
+                    {/* Item 10 - Brincos (Topo Direito) */}
+                    {nft.equipItem['10'] && (
+                      <div className="absolute top-0 right-0 w-10 h-10 translate-x-1/2 -translate-y-1/2">
+                        <img
+                          src={nft.equipItem['10'].itemPath}
+                          alt={nft.equipItem['10'].itemName}
+                          className="w-full h-full object-contain drop-shadow-lg"
+                          onError={(e) => {
+                            e.target.style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
